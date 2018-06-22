@@ -1,18 +1,15 @@
-# Build and Release Folders
-bin-debug/
-bin-release/
-[Oo]bj/
-[Bb]in/
+# local config file
+.local*
+*_local
 
-# Other files and folders
-.settings/
+# any passwd (or) key files
+.passwd
+*_passwd
+.key
+*_key
 
 # Executables
-*.swf
-*.air
-*.ipa
-*.apk
+*.deb
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+# Editor Settings Files
+.vscode*
