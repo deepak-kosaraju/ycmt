@@ -73,14 +73,14 @@ prep()
     ## Install pip for v2.7
     if ! [ -f '/usr/bin/pip' ]; then 
         action pip "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
-        apt-get -y install python-pip | tee ${log_dir}/bootstrap.log
+        apt-get -y install python-pip | tee -a ${log_dir}/bootstrap.log
     else
         skip pip install
     fi
 
     if [ -f '/usr/bin/pip' ] && ! pip show pipenv | grep [V]ersion;then
         action pipenv "installing using ${brown}pip${reset_color}"
-        pip install --user pipenv | tee ${log_dir}/bootstrap.log
+        pip install --user pipenv | tee -a ${log_dir}/bootstrap.log
     else
         skip pipenv install
     fi
@@ -92,7 +92,7 @@ clean()
     if [ -f '/usr/bin/git' ] || [ -f '/usr/bin/pip' ] || [ -d '/opt/ycmt' ];then
         if [ -f '/usr/bin/git' ]; then
             apt-get -y remove git 1>>${log_dir}/bootstrap.log
-            [ $? -eq 0 ] && action git 'removed using apt-get -y autoremove git command'
+            [ $? -eq 0 ] && action git 'removed using apt-get remove'
         fi
 
         ## UnInstall/Remove pip for v2.7
