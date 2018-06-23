@@ -19,6 +19,13 @@ rst=${reset_color}
 ## log directory for bootstrap
 log_dir='/var/log/ycmt'
 mkdir -p ${log_dir}
+log_file=${log_dir}/bootstrap.log
+
+if du -sh ${log_file} | grep M; then
+    cat /dev/null > ${log_file}
+fi
+
+echo "See ${log_file} for more details"
 
 date_time=$(date --iso-8601=seconds)
 python_version=$(python2 -V 2>&1)
@@ -28,14 +35,14 @@ python_version=$(python2 -V 2>&1)
 skip()
 {
     msg="${brown}${1}${reset_color} ${2}"
-    echo "${date_time} ${green}Skipping..${reset_color} ${msg}" | tee -a ${log_dir}/bootstrap.log
+    echo "${date_time} ${green}Skipping..${reset_color} ${msg}"
 }
 
 ## Prep function to print any events related to install/setup of dependencies
 action()
 {
     msg="${brown}${1}${reset_color} ${2}"
-    echo "${date_time} ${green}Preping..${reset_color} ${msg}" | tee -a ${log_dir}/bootstrap.log
+    echo "${date_time} ${green}Preping..${reset_color} ${msg}"
 }
 output()
 {
@@ -50,8 +57,9 @@ prep()
         action git 'apt install'
         ## install git
         # resynchronize the package index files from their sources
-        apt-get update 1>>${log_dir}/bootstrap.log
-        apt-get -y install git 
+        apt-get update >>$log_file 2>&1
+        apt-get -y install git >>$log_file 2>&1
+        # [ $? -eq 0 ] && which git || exit 2
     else
         skip git install
     fi
@@ -59,7 +67,7 @@ prep()
     if ! [ -d '/opt/ycmt' ]; then
             action ycmt "cloning from ${brown}git${reset_color} source"
              ## cloning ycmt tool from SCM(https://github.com/gdv-deepak/ycmt)
-            git clone https://github.com/gdv-deepakk/ycmt.git /tmp/ycmt 1>>${log_dir}/bootstrap.log
+            git clone https://github.com/gdv-deepakk/ycmt.git /tmp/ycmt >>$log_file 2>&1
     else
         skip ycmt "source clone as it exists under /opt/ycmt"
     fi
@@ -73,14 +81,21 @@ prep()
     ## Install pip for v2.7
     if ! [ -f '/usr/bin/pip' ]; then 
         action pip "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
-        apt-get -y install python-pip | tee -a ${log_dir}/bootstrap.log
+        apt-get -y install python-pip python-dev >>$log_file 2>&1
+        # [ $? -eq 0 ] && which pip || exit 2
     else
         skip pip install
     fi
 
-    if [ -f '/usr/bin/pip' ] && ! pip show pipenv | grep [V]ersion;then
+    if [ -f '/usr/bin/pip' ] && ! pip show pipenv | grep [V]ersion &> /dev/null;then
         action pipenv "installing using ${brown}pip${reset_color}"
-        pip install --user pipenv | tee -a ${log_dir}/bootstrap.log
+        pip install --user pipenv=='11.10.3' >>$log_file 2>&1
+        if [ $? -eq 0 ]; then
+            cd /opt/ycmt
+            /root/.local/bin/pipenv lock
+            /root/.local/bin/pipenv sync
+            /root/.local/bin/pipenv shell
+        fi
     else
         skip pipenv install
     fi
@@ -91,18 +106,18 @@ clean()
     ## if any one of following exist remove/uninstall them from system.
     if [ -f '/usr/bin/git' ] || [ -f '/usr/bin/pip' ] || [ -d '/opt/ycmt' ];then
         if [ -f '/usr/bin/git' ]; then
-            apt-get -y remove git 1>>${log_dir}/bootstrap.log
+            apt-get -y remove git >> $log_file 2>&1
             [ $? -eq 0 ] && action git 'removed using apt-get remove'
         fi
 
         ## UnInstall/Remove pip for v2.7
-        if pip show pipenv | grep [V]ersion; then 
-            pip uninstall pipenv 1>>${log_dir}/bootstrap.log
+        if [ -f '/usr/bin/pip' ] && pip show pipenv | grep [V]ersion &>/dev/null ; then 
+            pip uninstall -y pipenv >>$log_file 2>&1
             [ $? -eq 0 ] && action pipenv "uninstalled using ${brown}pip${reset_color}"
-            if [ $? -eq 0 ]; then
-                apt-get -y remove python-pip
-                [ $? -eq 0 ] && action pip "for ${green}${python_version}${reset_color} will be removed"
-            fi
+        fi
+        if [ -f '/usr/bin/pip' ]; then
+            apt-get -y remove python-pip python-dev-all >>${log_file} 2>&1
+            [ $? -eq 0 ] && action pip "for ${green}${python_version}${reset_color} will be removed"
         fi
 
         ## finally removing ycmt project folder
@@ -117,7 +132,7 @@ clean()
 }
 
 if [ $# -eq 1 ]; then
-    if [ "${1}" = "install" ] ; then
+    if [ "${1}" = "install" ] || [ "${1}" = 'setup' ] ; then
         prep
     elif [ "${1}" = "uninstall" ] || [ "${1}" = "cleanall" ] || [ "${1}" = "remove" ] || [ "${1}" = "clean" ] ; then
         clean
