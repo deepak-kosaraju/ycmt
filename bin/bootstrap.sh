@@ -96,7 +96,7 @@ clean()
 
         ## UnInstall/Remove pip for v2.7
         if pip show pipenv | grep [V]ersion; then 
-            pip -y uninstall pipenv 1>>${log_dir}/bootstrap.log
+            pip uninstall pipenv 1>>${log_dir}/bootstrap.log
             [ $? -eq 0 ] && action pipenv "uninstalled using ${brown}pip${reset_color}"
             if [ $? -eq 0 ]; then
                 apt-get -y remove python-pip
