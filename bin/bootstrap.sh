@@ -21,7 +21,7 @@ log_dir='/var/log/ycmt'
 mkdir -p ${log_dir}
 
 date_time=$(date --iso-8601=seconds)
-python_version=$(python2 -V)
+python_version=$(python2 -V 2>&1)
 ## Update apt package list
 
 ## Skip function to print any events realted to skipped prep events as they either exisit in most cases
@@ -71,14 +71,14 @@ prep()
 
     ## Preparations for installing Python virtual environment using pipenv, ref: https://docs.pipenv.org
     ## Install pip for v2.7
-    if ! [ -x '/usr/bin/pip' ]; then 
+    if ! [ -f '/usr/bin/pip' ]; then 
         action pip "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
         apt-get -y install python-pip | tee ${log_dir}/bootstrap.log
     else
         skip pip install
     fi
 
-    if [ -x '/usr/bin/pip' ] && ! pip show pipenv | grep [V]ersion;then
+    if [ -f '/usr/bin/pip' ] && ! pip show pipenv | grep [V]ersion;then
         action pipenv "installing using ${brown}pip${reset_color}"
         pip install --user pipenv | tee ${log_dir}/bootstrap.log
     else
@@ -88,8 +88,9 @@ prep()
 
 clean()
 {
-    if [ -x '/usr/bin/git' ] || pip show pipenv | grep [V]ersion || [ -d '/opt/ycmt' ];then     ## check if git exist if not install it
-        if [ -x '/usr/bin/git' ]; then
+    ## if any one of following exist remove/uninstall them from system.
+    if [ -f '/usr/bin/git' ] || [ -f '/usr/bin/pip' ] || [ -d '/opt/ycmt' ];then
+        if [ -f '/usr/bin/git' ]; then
             apt-get -y remove git 1>>${log_dir}/bootstrap.log
             [ $? -eq 0 ] && action git 'removed using apt-get -y autoremove git command'
         fi
@@ -105,7 +106,7 @@ clean()
         fi
 
         ## finally removing ycmt project folder
-        if [ -d '/opt/ycmt' ] || [ -d '/tmp/ycmt' ];then 
+        if [ -d '/opt/ycmt' ];then 
             action ycmt "removed under /opt/ycmt and /tmp/ycmt"
             rm -rf /opt/ycmt /tmp/ycmt
         fi
