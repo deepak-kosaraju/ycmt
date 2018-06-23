@@ -1,7 +1,5 @@
 #!/bin/sh
-BASEDIR=$(dirname "$0")
 
-## 
 # handy color vars for pretty prompts
 blue="\033[0;34m"
 green="\033[0;32m"
@@ -29,16 +27,15 @@ echo "See ${log_file} for more details"
 
 date_time=$(date --iso-8601=seconds)
 python_version=$(python2 -V 2>&1)
-## Update apt package list
 
-## Skip function to print any events realted to skipped prep events as they either exisit in most cases
+## Skip function to echo any events realted to skipped prep events as they either exisit in most cases
 skip()
 {
     msg="${brown}${1}${reset_color} ${2}"
     echo "${date_time} ${green}Skipping..${reset_color} ${msg}"
 }
 
-## Prep function to print any events related to install/setup of dependencies
+## Prep function to echo any events related to install/setup of dependencies
 action()
 {
     msg="${brown}${1}${reset_color} ${2}"
@@ -49,6 +46,7 @@ output()
     echo $@
 }
 
+## Do all the Bootstrp Setup
 prep()
 {
      
@@ -59,7 +57,6 @@ prep()
         # resynchronize the package index files from their sources
         apt-get update >>$log_file 2>&1
         apt-get -y install git >>$log_file 2>&1
-        # [ $? -eq 0 ] && which git || exit 2
     else
         skip git install
     fi
@@ -82,7 +79,6 @@ prep()
     if ! [ -f '/usr/bin/pip' ]; then 
         action pip "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
         apt-get -y install python-pip python-dev >>$log_file 2>&1
-        # [ $? -eq 0 ] && which pip || exit 2
     else
         skip pip install
     fi
@@ -101,6 +97,7 @@ prep()
     fi
 }
 
+## To remove all configuration done through bootstrap process
 clean()
 {
     ## if any one of following exist remove/uninstall them from system.
@@ -131,9 +128,12 @@ clean()
     fi
 }
 
+## check if argument is passed
 if [ $# -eq 1 ]; then
+    # to bootstrap either use install (or) setup
     if [ "${1}" = "install" ] || [ "${1}" = 'setup' ] ; then
         prep
+    # to remove all bootstrp trace use any of following options
     elif [ "${1}" = "uninstall" ] || [ "${1}" = "cleanall" ] || [ "${1}" = "remove" ] || [ "${1}" = "clean" ] ; then
         clean
     else
