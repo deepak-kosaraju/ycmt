@@ -1,0 +1,15 @@
+{
+    "packages": {
+        "install": {
+            "git": "rc"
+        },
+        "remove": []
+    },
+    "slack": {
+        "channels": []
+    },
+    "services": {
+        "atd": "stopped"
+    },
+    "configs": {}
+}

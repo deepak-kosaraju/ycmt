@@ -1,0 +1,22 @@
+{
+    "packages": {
+        "update_cache": "Yes",
+        "install": {
+            "apache2": "rc",
+            "php5": "rc",
+            "libapache2-mod-php5": "rc"
+        },
+        "remove": []
+    },
+    "slack": {
+        "channels": []
+    },
+    "files": {
+        "index.php": {
+            "source": "files/index.php",
+            "dest": "/var/www/html/",
+            "user": "root",
+            "group": "root"
+        }
+    }
+}
