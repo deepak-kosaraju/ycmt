@@ -1,0 +1,13 @@
+{
+    "packages": {
+        "update_cache": "No",
+        "install": {
+            "apache2": "rc"
+        },
+        "remove": []
+    },
+    "slack": {
+        "channels": []
+    },
+    "files": {}
+}

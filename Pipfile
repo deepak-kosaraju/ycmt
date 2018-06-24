@@ -7,13 +7,12 @@ name = "pypi"
 slackclient = "*"
 #supervisor = "*"
 requests = "*"
-
+subprocess = "*"
 
 [dev-packages]
 pytest = "*"
 #pylint = "*"
 #autopep8 = "*"
 
-
 [requires]
-python_version = "2.7"
+python_version = "3.4"
