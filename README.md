@@ -9,6 +9,13 @@ yet(another)ConfigurationManagementTool
 - Tool must provide some mechanism for restarting a service when relevant files or packages are updated
 - Tool must be idempotent - it must be safe to apply your configuration over and over again
 
+### Basic Architecture
+![Architecture](images/ycmt-arch-v01.jpeg?raw=true)
+
+
+## In Action Video:
+https://drive.google.com/file/d/1vqZTs-o5zhg9Sy4b8VM_dH45YJH87Thf/view?usp=sharing
+
 ### Supported Language Intrepret
 - Python v3.x - as python 2.7.x will be deprecated in future, so decided to do this with Python v3 
 
@@ -63,12 +70,13 @@ Do you want to continue [Y/n]: Y
 ```
 
 ### Standard Template
+`default.json` (default/base policy)
 ```json
 {
     "packages": {
-        "update_cache": "False",
+        "update_cache": "False(future as needed)",
         "install": {
-            "pkg": "verssion"
+            "pkg": "<version - future release currently it will install any latest rc availabe in the repo"
         },
         "remove": [
             "pkg-only"
@@ -100,13 +108,13 @@ Do you want to continue [Y/n]: Y
     }
 }
 ```
+`<short_hostname>.json` (host specific policy)
 
-#### optional elements:
-- slack, remove
+#### optional config params:
+- `slack[]`
+- `remove[]`
 
-#### Future Elements
+### Future Integrations in Plan
 - Send event to SLACK ( this is easy implementation and I wanted to do it in v0.1 but as I have spend most of my time with config design I have decided to push this to next release based on interest of time) 
 - Send logs to ElasticSearch directly in Structure Format
 - Send Metrics to Prometheus regarding deployments stats
-
-More document to come...
