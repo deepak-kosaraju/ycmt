@@ -7,7 +7,7 @@
             "libapache2-mod-php5": "rc"
         },
         "remove": [
-            'host2-worker'
+            "host2-worker"
         ]
     },
     "slack": {
