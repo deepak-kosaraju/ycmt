@@ -70,31 +70,33 @@ prep()
     fi
     
     if [ -d '/tmp/ycmt' ];then
-        # git pull and rsync the project
-        cd /tmp/ycmt; git pull && rsync -arzC . /opt/ycmt
+        # git pull and rsync the projec
+        cd /tmp/ycmt; git pull
+        rsync -arzvC /tmp/ycmt /opt/ycmt
+        cd /opt/ycmt
     fi
 
-    ## Preparations for installing Python virtual environment using pipenv, ref: https://docs.pipenv.org
-    ## Install pip3 for v3.4
-    if ! [ -f '/usr/bin/pip3' ]; then 
-        action pip3 "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
-        apt-get -y install python3-pip python3-dev >>$log_file 2>&1
-    else
-        skip pip3 install
-    fi
+    # ## Preparations for installing Python virtual environment using pipenv, ref: https://docs.pipenv.org
+    # ## Install pip3 for v3.4
+    # if ! [ -f '/usr/bin/pip3' ]; then 
+    #     action pip3 "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
+    #     apt-get -y install python3-pip python3-dev >>$log_file 2>&1
+    # else
+    #     skip pip3 install
+    # fi
 
-    if [ -f '/usr/bin/pip3' ] && ! pip3 show pipenv | grep [V]ersion &> /dev/null;then
-        action pipenv "installing using ${brown}pip${reset_color}"
-        pip3 install --user pipenv=='11.10.3' >>$log_file 2>&1
-        if [ $? -eq 0 ]; then
-            cd /opt/ycmt
-            /root/.local/bin/pipenv lock
-            /root/.local/bin/pipenv sync
-            /root/.local/bin/pipenv shell
-        fi
-    else
-        skip pipenv install
-    fi
+    # if [ -f '/usr/bin/pip3' ] && ! pip3 show pipenv | grep [V]ersion &> /dev/null;then
+    #     action pipenv "installing using ${brown}pip${reset_color}"
+    #     pip3 install --user pipenv=='11.10.3' >>$log_file 2>&1
+    #     if [ $? -eq 0 ]; then
+    #         cd /opt/ycmt
+    #         /root/.local/bin/pipenv lock
+    #         /root/.local/bin/pipenv sync
+    #         /root/.local/bin/pipenv shell
+    #     fi
+    # else
+    #     skip pipenv install
+    # fi
 }
 
 ## To remove all configuration done through bootstrap process
@@ -107,15 +109,15 @@ clean()
             [ $? -eq 0 ] && action git 'removed using apt-get remove'
         fi
 
-        ## UnInstall/Remove pip3 for v3.4
-        if [ -f '/usr/bin/pip3' ] && pip3 show pipenv | grep [V]ersion &>/dev/null ; then 
-            pip3 uninstall -y pipenv >>$log_file 2>&1
-            [ $? -eq 0 ] && action pipenv "uninstalled using ${brown}pip3${reset_color}"
-        fi
-        if [ -f '/usr/bin/pip3' ]; then
-            apt-get -y remove python3-pip python3-dev-all >>${log_file} 2>&1
-            [ $? -eq 0 ] && action pip3 "for ${green}${python_version}${reset_color} will be removed"
-        fi
+        # ## UnInstall/Remove pip3 for v3.4
+        # if [ -f '/usr/bin/pip3' ] && pip3 show pipenv | grep [V]ersion &>/dev/null ; then 
+        #     pip3 uninstall -y pipenv >>$log_file 2>&1
+        #     [ $? -eq 0 ] && action pipenv "uninstalled using ${brown}pip3${reset_color}"
+        # fi
+        # if [ -f '/usr/bin/pip3' ]; then
+        #     apt-get -y remove python3-pip python3-dev-all >>${log_file} 2>&1
+        #     [ $? -eq 0 ] && action pip3 "for ${green}${python_version}${reset_color} will be removed"
+        # fi
 
         ## finally removing ycmt project folder
         if [ -d '/opt/ycmt' ];then 
