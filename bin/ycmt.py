@@ -63,7 +63,9 @@ def main():
     creset = color.reset_color
     header = color.BOLD + color.OKBLUE
 
-    help_desc = header + color.OKGREEN + 'Yet(another)ConfigurationManagementTool ' + creset + '- ycmt to deploy and configure simple services'
+    help_desc = header + color.OKGREEN + \
+        'Yet(another)ConfigurationManagementTool ' + creset + \
+        '- ycmt to deploy and configure simple services'
 
     arg_parser = argparse.ArgumentParser(description=help_desc)
     arg_parser.add_argument(
@@ -77,23 +79,13 @@ def main():
     add_time = color.UNDERLINE + color.purple + current_time + creset
 
     # Reading policy rules configs
+    # Appling default policy and then we will jump to individual host policies
     try:
         with open(args.conf, 'r') as conf_file:
             base_policy = json.load(conf_file)
             if verbose >= 3:
                 print("default config file loaded: {}".format(base_policy))
-        if os.path.isfile(conf_dir + short_hostname + '.json'):
-            with open(conf_dir + short_hostname + '.json') as host_conf_file:
-                host_policy = json.load(host_conf_file)
-                if verbose >= 3:
-                    print("config file updated to host spec:\n{}".format(host_policy))
-    except IOError as err:
-        print(err)
-
-    # Appling default policy and then we will jump to individual host policies
-    try:
-        # Apply base policy first before applying host specfiic policies
-        if base_policy:
+            # Apply base policy first before applying host specfiic policies
             print(
                 header + "## Applying Base Policies of Package Manager, Services, Configs ##" + creset)
             logger_app.info(
@@ -101,18 +93,21 @@ def main():
             manage_packages('base', base_policy['packages'])
             manage_services('base', base_policy['services'])
             manage_configs('base', base_policy['configs'])
-
-        # Apply HOST specific policies
-        if host_policy:
-            print(
-                header + "## Applying Host Policies of Package Manager, Services, Conigs ##" + creset)
-            logger_app.info(
-                'Applying Host Policies of Package Manager, Services, Conigs')
-            manage_packages('host', host_policy['packages'])
-            manage_services('host', host_policy['services'])
-            manage_configs('host', host_policy['configs'])
-    except:
-        exception()
+        if os.path.isfile(conf_dir + short_hostname + '.json'):
+            with open(conf_dir + short_hostname + '.json') as host_conf_file:
+                host_policy = json.load(host_conf_file)
+                if verbose >= 3:
+                    print("config file updated to host spec:\n{}".format(host_policy))
+                # Apply HOST specific policies
+                print(
+                    header + "## Applying Host Policies of Package Manager, Services, Conigs ##" + creset)
+                logger_app.info(
+                    'Applying Host Policies of Package Manager, Services, Conigs')
+                manage_packages('host', host_policy['packages'])
+                manage_services('host', host_policy['services'])
+                manage_configs('host', host_policy['configs'])
+    except IOError as err:
+        print(err)
 
 # Function to manage-packages
 def manage_packages(policy, rules):
@@ -451,9 +446,10 @@ class Colors:
 
 # command exception function to tra
 def exception():
-    formatted_lines = traceback.format_exc().splitlines()
-    print(formatted_lines[0])
-    print(formatted_lines[-1])
+    print(traceback.format_exc())
+    # formatted_lines = traceback.format_exc().splitlines()
+    # print(formatted_lines[0])
+    # print(formatted_lines[-1])
 
 
 if __name__ == "__main__":
