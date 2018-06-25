@@ -72,7 +72,7 @@ prep()
     if [ -d '/tmp/ycmt' ];then
         # git pull and rsync the projec
         cd /tmp/ycmt; git pull
-        rsync -arzvC /tmp/ycmt /opt/ycmt
+        rsync -arzvC /tmp/ycmt/ /opt/ycmt
         cd /opt/ycmt
     fi
 
