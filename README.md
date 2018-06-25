@@ -39,13 +39,13 @@ https://drive.google.com/file/d/1vqZTs-o5zhg9Sy4b8VM_dH45YJH87Thf/view?usp=shari
 
 ## Considerations Patterns
 ### config files
-- ini - informal standard for configuration files for some platforms or software. INI files are simple text files with a basic structure composed of sections, properties, and values
-- json - JavaScript Object Notation or JSON is an open-standard file format that uses human-readable text to transmit data objects consisting of attribute–value pairs and array data types ( choosen )
-- yaml - is a human-readable data serialization language. It is commonly used for configuration files, but could be used in many applications where data is being stored or transmitted
+- **`.ini`** - informal standard for configuration files for some platforms or software. INI files are simple text files with a basic structure composed of sections, properties, and values
+- **`.json`** - JavaScript Object Notation or JSON is an open-standard file format that uses human-readable text to transmit data objects consisting of attribute–value pairs and array data types ( choosen )
+- **`.yaml`** - is a human-readable data serialization language. It is commonly used for configuration files, but could be used in many applications where data is being stored or transmitted
 
-After experementing I have choosen `.json` over `.ini` and `.yml` because I was able to define the state(policy rules) of a host in most human friendly format with `key:value ` and `array` objects. Having significant experience with `.json` notation of objects I have decided to use it for best interest of time after spedning few hours on `.ini` and `.yml`
+After experementing I have choosen `.json` over `.ini` and `.yml` because I was able to define the state(policy rules) of a host in most human friendly format with `key:value ` and `array` objects. Having significant experience with `.json` notation of objects I have decided to use it for best interest of time even after spedning few hours on `.ini` and `.yml`, but if I do have future plans to do more on `.ini` (or) `.yml` based configuration for tools like this.
 
-**BTW:** these days as part of my personal projects I am using `.yml` for defining `deployments` of Kubernetes.
+**BTW:** these days as part of my personal projects I am using `.yml` for defining `deployments` of Kubernetes but it also supports `.json` :-) 
 
 ### Consumption Pattern
 - `default.json` - default policy rules to enforce on every host
