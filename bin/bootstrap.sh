@@ -78,14 +78,14 @@ prep()
     ## Install pip for v2.7
     if ! [ -f '/usr/bin/pip' ]; then 
         action pip "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
-        apt-get -y install python-pip python-dev >>$log_file 2>&1
+        apt-get -y install python3-pip python3-dev >>$log_file 2>&1
     else
         skip pip install
     fi
 
-    if [ -f '/usr/bin/pip' ] && ! pip show pipenv | grep [V]ersion &> /dev/null;then
+    if [ -f '/usr/bin/pip3' ] && ! pip show pipenv | grep [V]ersion &> /dev/null;then
         action pipenv "installing using ${brown}pip${reset_color}"
-        pip install --user pipenv=='11.10.3' >>$log_file 2>&1
+        pip3 install --user pipenv=='11.10.3' >>$log_file 2>&1
         if [ $? -eq 0 ]; then
             cd /opt/ycmt
             /root/.local/bin/pipenv lock
@@ -101,18 +101,18 @@ prep()
 clean()
 {
     ## if any one of following exist remove/uninstall them from system.
-    if [ -f '/usr/bin/git' ] || [ -f '/usr/bin/pip' ] || [ -d '/opt/ycmt' ];then
+    if [ -f '/usr/bin/git' ] || [ -f '/usr/bin/pip3' ] || [ -d '/opt/ycmt' ];then
         if [ -f '/usr/bin/git' ]; then
             apt-get -y remove git >> $log_file 2>&1
             [ $? -eq 0 ] && action git 'removed using apt-get remove'
         fi
 
         ## UnInstall/Remove pip for v2.7
-        if [ -f '/usr/bin/pip' ] && pip show pipenv | grep [V]ersion &>/dev/null ; then 
+        if [ -f '/usr/bin/pip3' ] && pip show pipenv | grep [V]ersion &>/dev/null ; then 
             pip uninstall -y pipenv >>$log_file 2>&1
             [ $? -eq 0 ] && action pipenv "uninstalled using ${brown}pip${reset_color}"
         fi
-        if [ -f '/usr/bin/pip' ]; then
+        if [ -f '/usr/bin/pip3' ]; then
             apt-get -y remove python-pip python-dev-all >>${log_file} 2>&1
             [ $? -eq 0 ] && action pip "for ${green}${python_version}${reset_color} will be removed"
         fi

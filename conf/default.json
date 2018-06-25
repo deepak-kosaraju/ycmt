@@ -11,5 +11,14 @@
     "services": {
         "atd": "stopped"
     },
-    "configs": {}
+    "configs": {
+        "files": [
+            "index.html"
+        ],
+        "index.html": {
+            "dest": "/var/www/html/index.html",
+            "notify": "apache2:reload",
+            "action": "delete"
+        }
+    }
 }

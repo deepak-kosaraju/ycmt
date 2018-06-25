@@ -1,15 +1,12 @@
 {
     "packages": {
-        "update_cache": "No",
+        "update_cache": "False",
         "install": {
             "apache2": "rc",
             "php5": "rc",
             "libapache2-mod-php5": "rc"
         },
-        "remove": [
-            "git",
-            "worker"
-        ]
+        "remove": []
     },
     "slack": {
         "channels": []
@@ -18,11 +15,27 @@
         "apache2": "started"
     },
     "configs": {
+        "files": [
+            "index.php",
+            "group.php"
+        ],
         "index.php": {
             "source": "files/index.php",
-            "dest": "/var/www/html/",
+            "dest": "/var/www/html/index.php",
             "user": "root",
-            "group": "root"
+            "group": "root",
+            "mode": "00744",
+            "notify": "apache2:reload",
+            "action": "create"
+        },
+        "group.php": {
+            "source": "files/group.php",
+            "dest": "/var/www/html/group.php",
+            "user": "www-data",
+            "group": "www-data",
+            "mode": "00744",
+            "notify": "apache2:reload",
+            "action": "create"
         }
     }
 }
