@@ -27,6 +27,8 @@ TOC created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc.go)
 - Tool must provide some mechanism for restarting a service when relevant files or packages are updated
 - Tool must be idempotent - it must be safe to apply your configuration over and over again
 
+__Having worked on various configuration orchestrator's like Chef, Puppet, Ansible(new) etc.., I tried to incoorporate my learnings(from experince) of those tools in to this tool, so you may find some similarities with state names etc..__
+
 ### Basic Architecture
 ![Architecture](images/ycmt-arch-v01.jpeg?raw=true)
 
@@ -94,7 +96,7 @@ Do you want to continue [Y/n]: Y
     "packages": {
         "update_cache": "False(future as needed)",
         "install": {
-            "pkg": "<version - future release currently it will install any latest rc availabe in the repo"
+            "pkg": "<version - future release will support this currently it will install any latest rc availabe in the repo"
         },
         "remove": [
             "pkg-only"
@@ -117,7 +119,7 @@ Do you want to continue [Y/n]: Y
             "user": "<user>",
             "group": "<group",
             "mode": "< 5 digit mode - 01744>",
-            "notify": "<service>:<state>",
+            "notify": "<service>:<action>",
             "action": "<create|delete>"
         },
         "file2": {
@@ -127,6 +129,10 @@ Do you want to continue [Y/n]: Y
 }
 ```
 `<short_hostname>.json` (host specific policy)
+
+- Valid `state` for `service{}` - `started` (or) `stopped` (or) `reloaded`, I didn't add `restarted` as it didn't made sence to add it.
+- Valid `action` for `"notify":` in `configs.file[n]` - `reload`, `restart`, `stop` - I kept this native to standard `service` command actions.
+- 
 
 #### optional config params:
 - `slack[]`
