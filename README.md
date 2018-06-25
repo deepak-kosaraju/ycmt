@@ -1,6 +1,24 @@
 # ycmt 
 yet(another)ConfigurationManagementTool
 
+Table of Contents
+=================
+
+* [Design Principles](#design-principles)
+* [Basic Architecture](#basic-architecture)
+* [In Action Video:](#in-action-video)
+* [Supported Language Intrepret](#supported-language-intrepret)
+* [Considerations Patterns](#considerations-patterns)
+* [config files](#config-files)
+* [Consumption Pattern](#consumption-pattern)
+* [How to download and setup the tool](#how-to-download-and-setup-the-tool)
+* [How to use the tool](#how-to-use-the-tool)
+* [Standard Template](#standard-template)
+    * [optional config params:](#optional-config-params)
+* [Future Integrations in Plan](#future-integrations-in-plan)
+
+TOC created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc.go)
+
 ## Design Principles
 
 - If tool has dependencies not available on a standard Ubuntu instance you may include a [`bootstrap.sh`](https://raw.githubusercontent.com/gdv-deepakk/ycmt/master/bin/bootstrap.sh) program to resolve them
