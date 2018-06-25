@@ -34,7 +34,7 @@ TOC created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc.go)
 ## In Action Video:
 https://drive.google.com/file/d/1vqZTs-o5zhg9Sy4b8VM_dH45YJH87Thf/view?usp=sharing
 
-### Supported Language Intrepret
+### Supported Language Interpreter
 - Python v3.x - as python 2.7.x will be deprecated in future, so decided to do this with Python v3 
 
 ## Considerations Patterns
