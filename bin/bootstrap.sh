@@ -108,9 +108,9 @@ clean()
         fi
 
         ## UnInstall/Remove pip for v2.7
-        if [ -f '/usr/bin/pip3' ] && pip show pipenv | grep [V]ersion &>/dev/null ; then 
-            pip uninstall -y pipenv >>$log_file 2>&1
-            [ $? -eq 0 ] && action pipenv "uninstalled using ${brown}pip${reset_color}"
+        if [ -f '/usr/bin/pip3' ] && pip3 show pipenv | grep [V]ersion &>/dev/null ; then 
+            pip3 uninstall -y pipenv >>$log_file 2>&1
+            [ $? -eq 0 ] && action pipenv "uninstalled using ${brown}pip3${reset_color}"
         fi
         if [ -f '/usr/bin/pip3' ]; then
             apt-get -y remove python-pip python-dev-all >>${log_file} 2>&1
