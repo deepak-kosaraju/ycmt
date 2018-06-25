@@ -114,7 +114,7 @@ clean()
         fi
         if [ -f '/usr/bin/pip3' ]; then
             apt-get -y remove python-pip python-dev-all >>${log_file} 2>&1
-            [ $? -eq 0 ] && action pip "for ${green}${python_version}${reset_color} will be removed"
+            [ $? -eq 0 ] && action pip3 "for ${green}${python_version}${reset_color} will be removed"
         fi
 
         ## finally removing ycmt project folder
