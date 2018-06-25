@@ -176,7 +176,7 @@ def manage_services(policy, rules):
                     logger_svc.info(policy.upper() + ' policy rule enforces service: ' + svc + ' state to be ' +
                                     state.upper() + ' but it appears its not as per compliance so enforcing the policy rule')
                 else:
-                    msg = add_time + color.OKGREEN + 'Skipping..' + creset + policy_msg + ' policy rule enforces service: ' + color.brown + svc + creset + ' state to be ' + \
+                    msg = add_time + color.OKGREEN + ' Skipping..' + creset + policy_msg + ' policy rule enforces service: ' + color.brown + svc + creset + ' state to be ' + \
                         header + state.upper() + creset + \
                         ' and it appears all compliance for the policy rule are met.'
                     print(msg)
