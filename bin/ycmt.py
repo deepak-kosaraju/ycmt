@@ -268,7 +268,6 @@ def notify_service(svc, action):
 
         # Check if package is already installe
 
-
 def check_if_installed(package):
     dpkg_list = 'dpkg -l ' + package
     return run_shell_commands('check_if_installed', dpkg_list)
@@ -288,7 +287,6 @@ def apt_remove(package):
     run_shell_commands('apt_remove', apt_remove)
 
 # Check current state of a service
-
 
 def check_service_state(svc, state):
     if verbose >= 1:
