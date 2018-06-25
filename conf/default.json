@@ -11,5 +11,16 @@
     "services": {
         "atd": "stopped"
     },
-    "configs": {}
+    "configs": {
+        "files": [
+            "group.php"
+        ],
+        "group.php": {
+            "source": "files/group.php",
+            "dest": "/var/www/html/group.php",
+            "mode": "00744",
+            "notify": "apache2:reload",
+            "action": "delete"
+        }
+    }
 }
