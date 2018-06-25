@@ -10,6 +10,8 @@ import time
 import filecmp
 from slackclient import SlackClient as slk
 from shutil import copyfile as cpfile
+import pwd
+import grp
 
 cwd = os.path.dirname(os.path.realpath(__file__))
 
@@ -68,13 +70,13 @@ def main():
                 header + "## Applying Base Policies of Package Manager, Services, Configs ##"+creset)
             manage_packages('base', base_policy['packages'])
             manage_services('base', base_policy['services'])
-            # manage_configs('base', base_policy['configs'])
+            manage_configs('base', base_policy['configs'])
         if host_policy:
             print(
                 header+"## Applying Host Policies of Package Manager, Services, Conigs ##"+creset)
             manage_packages('host', host_policy['packages'])
             manage_services('host', host_policy['services'])
-            # manage_configs('host', host_policy['configs'])
+            manage_configs('host', host_policy['configs'])
     except:
         exception()
 
@@ -143,38 +145,148 @@ def manage_configs(policy, rules):
     msg = add_time + " checking compliance of manage_configs rules of " + policy_msg + \
         " on this host: " + color.brown + color.BOLD + full_hostname + creset
     print(msg)
+    for file in rules['files']:
+        try:
+            if rules[file]['action'] == 'create':
+                source = source_dir + rules[file]['source']
+                if os.path.isfile(rules[file]['dest']):
+                    if filecmp.cmp(source, rules[file]['dest']):
+                        msg = add_time + color.OKGREEN + ' Skipping..' + \
+                            rules[file]['dest'] + creset + \
+                            ' content didn\'t change, so everything is in compliance with above policy rule.'
+                        print(msg)
+                        check_file_stat(
+                            rules[file]['dest'], rules[file]['user'], rules[file]['group'], rules[file]['mode'])
+                    else:
+                        sync_notify(source, rules[file])
+                        msg = add_time + color.OKGREEN + ' Copying..' + \
+                            rules[file]['dest'] + creset + \
+                            ' content changed in source ' + color.UNDERLINE + source + creset + \
+                            ' change, so everything is in compliance with above policy rule.'
+                        print(msg)
+
+                else:
+                    sync_notify(source, rules[file])
+                    msg = add_time + color.OKGREEN + ' Copying..' + \
+                        rules[file]['dest'] + creset + \
+                        ' file as its not found to meet compliance with above policy rule.'
+                    print(msg)
+
+            elif rules[file]['action'] == 'delete':
+                if os.path.isfile(rules[file]['dest']):
+                    os.remove(rules[file]['dest'])
+                    msg = add_time + color.FAIL + ' Policy ENFORCED..' + rules[file]['dest'] + \
+                        creset + ' file deleted as per compliance with above policy rule.'
+                    print(msg)
+                else:
+                    msg = add_time + color.OKGREEN + ' Skipping..' + rules[file]['dest'] + \
+                        creset + ' file deletion as everything is in compliance with above policy rule.'
+                    print(msg)
+        except:
+            exception()
 
 
-def sync_notify(src, dst, service):
+def check_file_stat(file, user, group, mode):
+    file_stat_info = os.stat(file)
+    cmode = oct(file_stat_info[0])[-5:]
+    uuid = file_stat_info[4]
+    guid = file_stat_info[5]
+    cuser = pwd.getpwuid(uuid)[0]
+    cgroup = grp.getgrgid(guid)[0]
+    if verbose >= 2:
+        print(file_stat_info)
+
+    if cuser != user or cgroup != group:
+        cmd = 'chown ' + user + ':' + \
+            group + ' ' + file
+
+        msg = add_time + ' current file ' + color.OKBLUE + color.BOLD + file + creset + ' ownership, user: ' + failH + cuser + creset + ', group: ' + failH + group + creset + \
+            ', excpected ownership user: ' + color.OKGREEN + user + \
+            creset + ', group: ' + color.OKGREEN + group + \
+            creset + ' ,so applied changes as per compliance with above policy rule'
+        print(msg)
+        if run_shell_commands('change_ownership', cmd):
+            msg = add_time + ' Ownership Update is: ' + color.OKGREEN + 'SUCCESS' + \
+                creset
+            print(msg)
+        else:
+            msg = add_time + ' Ownership Update is: ' + failH + 'UNSUCCESS' + \
+                creset
+            print(msg)
+
+    else:
+        msg = add_time + color.OKGREEN + ' Skipping..' + \
+            file + creset + \
+            ' Ownership as it is as per compliance with above policy rule.'
+        print(msg)
+        if verbose >= 3:
+            print("current mode:{}, policy mode:{}".format(cmode, mode))
+    if cmode != mode:
+        msg = add_time + ' current file permission mode: ' + failH + mode + creset + ', excpected file permission mode: ' + color.OKGREEN + mode + \
+            creset + creset + ' ,so applied changes as per compliance with above policy rule'
+        cmd = 'chmod ' + mode + ' ' + file
+        if run_shell_commands('change_file_permissions', cmd):
+            msg = add_time + ' Permission Mode Update is: ' + color.OKGREEN + 'SUCCESS' + \
+                creset
+            print(msg)
+        else:
+            msg = add_time + ' Permission Mode Update is: ' + failH + 'UNSUCCESS' + \
+                creset
+            print(msg)
+
+    else:
+        msg = add_time + color.OKGREEN + ' Skipping..' + \
+            file + creset + \
+            ' Permissions as it is as per compliance with above policy rule.'
+        print(msg)
+
+
+def sync_notify(src, file):
+    dst = file['dest']
+    notify = file['notify']
     cpfile(src, dst)
-    if service:
-        print('notify a service')
-        svc, action = service.split(':')
+    check_file_stat(
+        file['dest'], file['user'], file['group'], file['mode'])
+    if notify:
+        svc, action = notify.split(':')
+        msg = add_time + color.UNDERLINE + color.purple + \
+            ' Making Notify Call to a service: ' + creset
+        print(msg+'{}, action: {}'.format(svc, action))
         notify_service(svc, action)
 
-    # Check if package is already installe
 
+def notify_service(svc, action):
+    cmd = 'service ' + svc + ' ' + action
+    if run_shell_commands('notify_service', cmd):
+        msg = add_time + ' Service: ' + svc + ', action:' + \
+            action + ' is' + color.OKGREEN + ' SUCCESS' + creset
+        print(msg)
+    else:
+        msg = add_time + 'Service: ' + svc + ', action:' + action + ' is' + \
+            failH + ' UNSUCCESS' + creset + ', run using -vvv to verify details'
+        print(msg)
+
+        # Check if package is already installe
 
 def check_if_installed(package):
     dpkg_list = 'dpkg -l ' + package
-    return run_commands('check_if_installed', dpkg_list)
+    return run_shell_commands('check_if_installed', dpkg_list)
 
 # Install requied packag
 
 
 def apt_install(package):
     apt_install = 'apt-get install -y ' + package
-    run_commands('apt_install', apt_install)
+    run_shell_commands('apt_install', apt_install)
 
 # Remove package defined in policy files
 
 
 def apt_remove(package):
     apt_remove = 'apt-get remove -y ' + package
-    run_commands('apt_remove', apt_remove)
+    run_shell_commands('apt_remove', apt_remove)
 
 # Check current state of a service
-
 
 def check_service_state(svc, state):
     if verbose >= 1:
@@ -183,9 +295,9 @@ def check_service_state(svc, state):
         print(msg.format(svc, state))
     service_status = 'service ' + svc + ' status'
     if state == 'stopped':
-        return run_commands('is_service_down', service_status)
+        return run_shell_commands('is_service_down', service_status)
     elif state == 'started':
-        return run_commands('is_service_up', service_status)
+        return run_shell_commands('is_service_up', service_status)
 
 # enforce the state of the service in reference to policy rule
 
@@ -197,22 +309,13 @@ def enforce_service_state(svc, state):
     elif state == 'stopped':
         state = 'stop'
     enforce_status = 'service ' + svc + ' ' + state
-    run_commands('enforce_service_state', enforce_status)
-
-
-def notify_service(svc, type):
-    cmd = 'service ' + svc + ' type'
-    run_commands('notify_service', cmd)
-
-
-def config_files(files):
-    print("Files to Copy are:{}".format(files))
+    run_shell_commands('enforce_service_state', enforce_status)
 
 
 # Function to any system comamnd
 
 
-def run_commands(call_type, cmd):
+def run_shell_commands(call_type, cmd):
     try:
         cmd = list(cmd.split())
         if verbose >= 3:
@@ -298,8 +401,8 @@ if __name__ == "__main__":
         ', so please pay attention to your policy rules' + \
         warnH + ' ## WARNING ##' + '\033[0m'
     print(warning)
-    # answer = input("Do you want to continue [Y/n]: ")
-    answer = 'Y'
+    answer = input("Do you want to continue [Y/n]: ")
+    # answer = 'Y'
     if answer == 'Y':
         main()
     else:

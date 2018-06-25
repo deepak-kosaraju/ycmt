@@ -1,6 +1,6 @@
 {
     "packages": {
-        "update_cache": "No",
+        "update_cache": "False",
         "install": {
             "apache2": "rc",
             "php5": "rc",
@@ -31,6 +31,8 @@
         "group.php": {
             "source": "files/group.php",
             "dest": "/var/www/html/group.php",
+            "user": "www-data",
+            "group": "www-data",
             "mode": "00744",
             "notify": "apache2:reload",
             "action": "create"

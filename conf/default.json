@@ -13,12 +13,10 @@
     },
     "configs": {
         "files": [
-            "group.php"
+            "index.html"
         ],
-        "group.php": {
-            "source": "files/group.php",
-            "dest": "/var/www/html/group.php",
-            "mode": "00744",
+        "index.html": {
+            "dest": "/var/www/html/index.html",
             "notify": "apache2:reload",
             "action": "delete"
         }
