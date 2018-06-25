@@ -75,8 +75,8 @@ prep()
     fi
 
     ## Preparations for installing Python virtual environment using pipenv, ref: https://docs.pipenv.org
-    ## Install pip for v2.7
-    if ! [ -f '/usr/bin/pip' ]; then 
+    ## Install pip for v3.4
+    if ! [ -f '/usr/bin/pip3' ]; then 
         action pip3 "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
         apt-get -y install python3-pip python3-dev >>$log_file 2>&1
     else
