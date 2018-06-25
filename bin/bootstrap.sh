@@ -26,7 +26,7 @@ fi
 echo "See ${log_file} for more details"
 
 date_time=$(date --iso-8601=seconds)
-python_version=$(python2 -V 2>&1)
+python_version=$(python3 -V 2>&1)
 
 ## Skip function to echo any events realted to skipped prep events as they either exisit in most cases
 skip()
@@ -77,13 +77,13 @@ prep()
     ## Preparations for installing Python virtual environment using pipenv, ref: https://docs.pipenv.org
     ## Install pip for v2.7
     if ! [ -f '/usr/bin/pip' ]; then 
-        action pip "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
+        action pip3 "for ${green}${python_version}${reset_color} not found, so installing from ${brown}apt${reset_color}"
         apt-get -y install python3-pip python3-dev >>$log_file 2>&1
     else
         skip pip install
     fi
 
-    if [ -f '/usr/bin/pip3' ] && ! pip show pipenv | grep [V]ersion &> /dev/null;then
+    if [ -f '/usr/bin/pip3' ] && ! pip3 show pipenv | grep [V]ersion &> /dev/null;then
         action pipenv "installing using ${brown}pip${reset_color}"
         pip3 install --user pipenv=='11.10.3' >>$log_file 2>&1
         if [ $? -eq 0 ]; then
