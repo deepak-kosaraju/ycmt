@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 slackclient = "*"
 #supervisor = "*"
-requests = "*"
+requests = ">=2.20.0"
 subprocess = "*"
 
 [dev-packages]
