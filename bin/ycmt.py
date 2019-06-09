@@ -7,6 +7,7 @@ from socket import gethostname as hostname
 import subprocess as cli
 import datetime
 import time
+import pytz
 import filecmp
 # from slackclient import SlackClient as slk
 from shutil import copyfile as cpfile
@@ -27,10 +28,16 @@ ignore_true = 'true'
 global current_time
 
 # calculate the offset taking into account daylight saving time
-utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
-utc_offset = datetime.timedelta(seconds=-utc_offset_sec)
-current_time = datetime.datetime.now().replace(
-    tzinfo=datetime.timezone(offset=utc_offset), microsecond=0).isoformat()
+# utc_offset_sec = time.altzone if time.localtime().tm_isdst else time.timezone
+# utc_offset = datetime.timedelta(seconds=-utc_offset_sec)
+# current_time = datetime.datetime.now().replace(
+#     tzinfo=datetime.timezone(offset=utc_offset), microsecond=0).isoformat()
+
+country = "America/Los_Angeles"
+server_tz = pytz.timezone(country)
+current_time = datetime.datetime.now(tz=server_tz)
+if verbose:
+    print(f"The time in {country} is {current_time}")
 
 LOG_FILENAME = '/var/log/ycmt/application.log'
 
